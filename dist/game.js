@@ -302,6 +302,8 @@ function bindDom() {
     "restartTopButton", "headerYear", "headerPeriod", "headerTurn", "startScreen", "playScreen",
     "finalScreen", "startButton", "restartFinalButton", "finalShareButton", "cultivationValue", "managementValue",
     "staminaValue", "trustValue", "cashValue", "debtValue", "areaValue", "machineValue",
+    "mobileYearPeriod", "mobileTurn", "mobileCultivation", "mobileManagement", "mobileStamina", "mobileTrust",
+    "mobileCash", "mobileDebt", "mobileArea", "mobileMachine",
     "abilitiesList", "abilityCount", "yearValue", "periodValue", "periodTheme", "weatherValue", "priceValue",
     "dotStage", "weatherLayer", "fieldLayer", "actorSprite", "machineSprite", "effectLayer", "abilityNotice",
     "dotTitle", "dotHint", "eventTitle", "eventDescription", "turnResult", "eventChoices", "actionButtons", "continueButton",
@@ -976,7 +978,25 @@ function renderStats() {
   dom.priceBonusValue.textContent = `+${Math.round(state.yearData.priceBonus * 100)}%`;
   dom.efficiencyValue.textContent = efficiencyLabel();
   dom.efficiencyValue.className = productionEfficiency() < 1 ? "negative" : "positive";
+  renderMobileHud();
   renderAbilities();
+}
+
+function renderMobileHud() {
+  if (!dom.mobileYearPeriod) return;
+  const period = state.screen === "play" ? currentPeriod() : PERIODS[0];
+  dom.mobileYearPeriod.textContent = state.screen === "play" ? `${state.year}年目 ${period.label}` : "5年間";
+  dom.mobileTurn.textContent = state.screen === "play" ? `TURN ${turnNumber()} / ${TOTAL_TURNS}` : `TURN 1 / ${TOTAL_TURNS}`;
+  dom.mobileCultivation.textContent = state.cultivation;
+  dom.mobileManagement.textContent = state.management;
+  dom.mobileStamina.textContent = state.stamina;
+  dom.mobileTrust.textContent = state.trust;
+  dom.mobileCash.textContent = `${state.cash}万`;
+  dom.mobileCash.className = state.cash < 100 ? "negative" : "positive";
+  dom.mobileDebt.textContent = `${state.debt}万`;
+  dom.mobileDebt.className = state.debt > 0 ? "negative" : "";
+  dom.mobileArea.textContent = `${formatArea(state.area)}町`;
+  dom.mobileMachine.textContent = state.machine;
 }
 
 function renderAbilities() {
