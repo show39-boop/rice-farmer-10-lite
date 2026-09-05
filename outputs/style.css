@@ -761,10 +761,27 @@ button {
 
 .primary-button {
   width: fit-content;
+  position: relative;
+  overflow: hidden;
   padding: 0 22px;
   background: var(--green);
   color: white;
   font-weight: 800;
+}
+
+.primary-button.tap-hint {
+  animation: tapPulse 1.05s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgba(47, 125, 69, 0.46), 0 10px 24px rgba(47, 125, 69, 0.24);
+}
+
+.primary-button.tap-hint::after {
+  content: "";
+  position: absolute;
+  inset: -60%;
+  background: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.52) 50%, transparent 65%);
+  transform: translateX(-72%) rotate(12deg);
+  animation: tapShine 1.35s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .ghost-button {
@@ -1348,6 +1365,28 @@ button {
   }
 }
 
+@keyframes tapPulse {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 0 0 0 rgba(47, 125, 69, 0.42), 0 10px 24px rgba(47, 125, 69, 0.2);
+  }
+
+  50% {
+    transform: translateY(-1px) scale(1.045);
+    box-shadow: 0 0 0 8px rgba(47, 125, 69, 0), 0 14px 28px rgba(47, 125, 69, 0.3);
+  }
+}
+
+@keyframes tapShine {
+  0% {
+    transform: translateX(-72%) rotate(12deg);
+  }
+
+  48%, 100% {
+    transform: translateX(72%) rotate(12deg);
+  }
+}
+
 @media (max-width: 1020px) {
   .game-grid {
     grid-template-columns: 1fr;
@@ -1525,8 +1564,12 @@ button {
   }
 
   .actions-box h3 {
-    margin-top: 10px;
-    white-space: nowrap;
+    max-width: 126px;
+    margin-top: 2px;
+    color: var(--ink);
+    font-size: 18px;
+    line-height: 1.16;
+    white-space: normal;
   }
 
   .event-box p {
@@ -1781,8 +1824,10 @@ button {
   }
 
   .actions-box h3 {
-    margin-top: 7px;
-    font-size: 13px;
+    max-width: 96px;
+    margin-top: 3px;
+    font-size: 16px;
+    line-height: 1.12;
   }
 
   .action-grid {

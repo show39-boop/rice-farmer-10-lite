@@ -1129,7 +1129,9 @@ function renderActions() {
   });
   dom.continueButton.classList.toggle("hidden", !state.awaitingContinue);
   const isFinalTurn = state.year === MAX_YEARS && currentPeriod().id === 8;
-  dom.continueButton.textContent = !isFinalTurn && turnNumber() <= 3 ? "ここをタップ" : isFinalTurn ? "最終結果へ" : "次の時期へ";
+  const showTapHint = !isFinalTurn && turnNumber() <= 3;
+  dom.continueButton.textContent = showTapHint ? "ここをタップ" : isFinalTurn ? "最終結果へ" : "次の時期へ";
+  dom.continueButton.classList.toggle("tap-hint", state.awaitingContinue && showTapHint);
 }
 
 function actionBadge(actionId) {
