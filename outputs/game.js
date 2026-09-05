@@ -966,6 +966,7 @@ function render() {
   dom.startScreen.classList.toggle("hidden", state.screen !== "start");
   dom.playScreen.classList.toggle("hidden", state.screen !== "play");
   dom.finalScreen.classList.toggle("hidden", state.screen !== "final");
+  document.body.classList.toggle("screen-final", state.screen === "final");
   const resultFirst =
     state.screen === "play" &&
     state.awaitingContinue &&
@@ -1384,10 +1385,12 @@ function titlePunchline(title) {
 
 function finalResultText() {
   const averageYield = Math.round(state.harvests.reduce((sum, h) => sum + h.yieldKg, 0) / state.harvests.length);
+  const averageProfit = Math.round(state.settlements.reduce((sum, y) => sum + y.profit, 0) / state.settlements.length);
   const machineryAssets = Math.round(90 + state.area * 40 + state.machine * 2);
   const netWorth = state.cash + machineryAssets - state.debt;
   const title = judgeTitle(netWorth, averageYield);
-  return `米農家10年 LITE\n\nあなたの農家人生\n5年目終了\n経営面積: ${formatArea(state.area)}町\n平均収量: ${averageYield}kg/10a\n純資産: ${netWorth}万円\n借金: ${state.debt}万円\n\n称号\n「${title}」`;
+  const punchline = titlePunchline(title, { averageProfit, netWorth });
+  return `米農家10年 LITE\n\nあなたの農家人生\n5年目終了\n平均利益: ${averageProfit}万円 / 年\n経営面積: ${formatArea(state.area)}町\n平均収量: ${averageYield}kg / 10a\n純資産: ${netWorth}万円\n借金: ${state.debt}万円\n\n称号\n「${title}」\n${punchline}`;
 }
 
 async function shareFinalResult() {
