@@ -1128,7 +1128,8 @@ function renderActions() {
     dom.actionButtons.appendChild(button);
   });
   dom.continueButton.classList.toggle("hidden", !state.awaitingContinue);
-  dom.continueButton.textContent = state.year === MAX_YEARS && currentPeriod().id === 8 ? "最終結果へ" : "次の時期へ";
+  const isFinalTurn = state.year === MAX_YEARS && currentPeriod().id === 8;
+  dom.continueButton.textContent = !isFinalTurn && turnNumber() <= 3 ? "ここをタップ" : isFinalTurn ? "最終結果へ" : "次の時期へ";
 }
 
 function actionBadge(actionId) {
