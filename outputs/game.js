@@ -304,6 +304,8 @@ function bindDom() {
     "staminaValue", "trustValue", "cashValue", "debtValue", "areaValue", "machineValue",
     "mobileYearPeriod", "mobileTurn", "mobileCultivation", "mobileManagement", "mobileStamina", "mobileTrust",
     "mobileCash", "mobileDebt", "mobileArea", "mobileMachine",
+    "mobileForecastYieldValue", "mobileLastYieldValue", "mobileLastSalesValue", "mobileExpenseValue",
+    "mobileAreaDataValue", "mobilePriceBonusValue", "mobileEfficiencyValue", "mobileRicePriceValue",
     "abilitiesList", "abilityCount", "yearValue", "periodValue", "periodTheme", "weatherValue", "priceValue",
     "dotStage", "weatherLayer", "fieldLayer", "actorSprite", "machineSprite", "effectLayer", "abilityNotice",
     "dotTitle", "dotHint", "eventTitle", "eventDescription", "turnResult", "eventChoices", "actionButtons", "continueButton",
@@ -391,6 +393,7 @@ function emptyYearState() {
     landEventPeriods: [],
     landEventsDone: [],
     extraActionsByPeriod: {},
+    priceAnnounced: false,
     sales: 0,
     expenses: 0,
     profit: 0
@@ -435,7 +438,7 @@ function startYear() {
   state.yearData = emptyYearState();
   state.yearData.landEventPeriods = planLandEventPeriods();
   state.yearData.extraActionsByPeriod = planExtraActions();
-  addLog(`${state.year}年目`, `天候は${state.weather.label}、米価は${state.price.label}。`);
+  addLog(`${state.year}年目`, `天候は${state.weather.label}、米価は7月末に発表。`);
 }
 
 function currentPeriod(s = state) {
@@ -618,6 +621,9 @@ function applyEffects(effects) {
 }
 
 function finishPeriod() {
+  if (currentPeriod().id === 5 && !state.yearData.priceAnnounced) {
+    announceRicePrice();
+  }
   if (currentPeriod().id === 7 && !state.harvestedThisYear) {
     harvest();
     state.harvestedThisYear = true;
@@ -628,6 +634,17 @@ function finishPeriod() {
   }
   if (state.turnResult) state.turnResult.after = resultSnapshot();
   state.awaitingContinue = true;
+}
+
+function announceRicePrice() {
+  state.yearData.priceAnnounced = true;
+  const message = `コメ価格の発表。${state.price.label}、${formatYen(state.price.yen)}円 / 60kg。`;
+  addLog(currentPeriod().label, message);
+  if (state.turnResult) {
+    state.turnResult.event = "コメ価格の発表";
+    state.turnResult.messages.push(message);
+    state.turnResult.after = resultSnapshot();
+  }
 }
 
 function playDotAnimation(actionId) {
@@ -1003,6 +1020,17 @@ function renderMobileHud() {
   dom.mobileDebt.className = state.debt > 0 ? "negative" : "";
   dom.mobileArea.textContent = `${formatArea(state.area)}町`;
   dom.mobileMachine.textContent = state.machine;
+  if (dom.mobileForecastYieldValue) {
+    dom.mobileForecastYieldValue.textContent = `${forecastYield()}kg / 10a`;
+    dom.mobileLastYieldValue.textContent = state.harvests.length ? `${last(state.harvests).yieldKg}kg / 10a` : "-";
+    dom.mobileLastSalesValue.textContent = state.harvests.length ? `${last(state.harvests).sales}万円` : "-";
+    dom.mobileExpenseValue.textContent = `${annualExpenses()}万円`;
+    dom.mobileAreaDataValue.textContent = `${formatArea(state.area)}町`;
+    dom.mobilePriceBonusValue.textContent = `+${Math.round(state.yearData.priceBonus * 100)}%`;
+    dom.mobileEfficiencyValue.textContent = efficiencyLabel();
+    dom.mobileEfficiencyValue.className = productionEfficiency() < 1 ? "negative" : "positive";
+    dom.mobileRicePriceValue.textContent = ricePriceDisplayText();
+  }
 }
 
 function renderAbilities() {
@@ -1026,13 +1054,20 @@ function renderMain() {
   dom.periodValue.textContent = period.label;
   dom.periodTheme.textContent = period.theme;
   dom.weatherValue.textContent = state.weather.label;
-  dom.priceValue.textContent = `${state.price.label} ${formatYen(state.price.yen)}円`;
+  dom.priceValue.textContent = ricePriceDisplayText();
   dom.forecastYieldValue.textContent = `${forecastYield()}kg / 10a`;
   dom.lastYieldValue.textContent = state.harvests.length ? `${last(state.harvests).yieldKg}kg / 10a` : "-";
   dom.lastSalesValue.textContent = state.harvests.length ? `${last(state.harvests).sales}万円` : "-";
   renderEvent(period);
   renderHarvest();
   renderSettlement();
+}
+
+function ricePriceDisplayText() {
+  if (state.screen !== "play") return "-";
+  return state.yearData.priceAnnounced
+    ? `${state.price.label} ${formatYen(state.price.yen)}円`
+    : "7月末に発表";
 }
 
 function renderEvent(period) {
@@ -1116,7 +1151,9 @@ function renderActions() {
   dom.actionButtons.innerHTML = "";
   const canAct = state.screen === "play" && !state.pendingEvent && !state.awaitingContinue && !state.animation;
   if (state.screen !== "play") return;
-  currentActionIds().forEach((id) => {
+  const actionIds = currentActionIds();
+  dom.actionButtons.classList.toggle("few-actions", actionIds.length <= 2 && !state.awaitingContinue);
+  actionIds.forEach((id) => {
     const action = ACTIONS[id];
     const button = document.createElement("button");
     button.className = action.temporary ? "action-button temporary-action" : "action-button";
@@ -1130,8 +1167,13 @@ function renderActions() {
   dom.continueButton.classList.toggle("hidden", !state.awaitingContinue);
   const isFinalTurn = state.year === MAX_YEARS && currentPeriod().id === 8;
   const showTapHint = !isFinalTurn && turnNumber() <= 3;
+  const isResultContinue =
+    state.awaitingContinue &&
+    ((currentPeriod().id === 7 && state.harvestedThisYear) ||
+      (currentPeriod().id === 8 && state.settledThisYear));
   dom.continueButton.textContent = isFinalTurn ? "最終結果へ" : "次の時期へ";
   dom.continueButton.classList.toggle("tap-hint", state.awaitingContinue && showTapHint);
+  dom.continueButton.classList.toggle("result-continue", isResultContinue);
 }
 
 function actionBadge(actionId) {
