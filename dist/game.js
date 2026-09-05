@@ -1130,7 +1130,7 @@ function renderActions() {
   dom.continueButton.classList.toggle("hidden", !state.awaitingContinue);
   const isFinalTurn = state.year === MAX_YEARS && currentPeriod().id === 8;
   const showTapHint = !isFinalTurn && turnNumber() <= 3;
-  dom.continueButton.textContent = showTapHint ? "ここをタップ" : isFinalTurn ? "最終結果へ" : "次の時期へ";
+  dom.continueButton.textContent = isFinalTurn ? "最終結果へ" : "次の時期へ";
   dom.continueButton.classList.toggle("tap-hint", state.awaitingContinue && showTapHint);
 }
 
@@ -1279,7 +1279,8 @@ function renderFinal() {
       <div class="ending-farmer" aria-hidden="true"><span></span></div>
       <span>あなたの農家人生</span>
       <strong>5年目終了</strong>
-      <p>経営面積: ${formatArea(state.area)}町<br>
+      <p>平均利益: ${formatYen(averageProfit * 10000)}円 / 年<br>
+      経営面積: ${formatArea(state.area)}町<br>
       平均収量: ${averageYield}kg / 10a<br>
       純資産: ${netWorth}万円<br>
       借金: ${state.debt}万円</p>

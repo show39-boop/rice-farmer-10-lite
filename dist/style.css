@@ -770,8 +770,10 @@ button {
 }
 
 .primary-button.tap-hint {
+  border-color: rgba(184, 92, 56, 0.22);
+  background: linear-gradient(135deg, #f2a33b, #d86a2e);
   animation: tapPulse 1.05s ease-in-out infinite;
-  box-shadow: 0 0 0 0 rgba(47, 125, 69, 0.46), 0 10px 24px rgba(47, 125, 69, 0.24);
+  box-shadow: 0 0 0 0 rgba(216, 106, 46, 0.5), 0 10px 24px rgba(184, 92, 56, 0.3);
 }
 
 .primary-button.tap-hint::after {
@@ -782,6 +784,31 @@ button {
   transform: translateX(-72%) rotate(12deg);
   animation: tapShine 1.35s ease-in-out infinite;
   pointer-events: none;
+}
+
+.play-screen.result-first {
+  display: flex;
+  flex-direction: column;
+}
+
+.play-screen.result-first .harvest-card,
+.play-screen.result-first .settlement-card {
+  order: -1;
+}
+
+.play-screen.result-first .actions-box {
+  order: 3;
+}
+
+.play-screen.result-first .actions-box h3,
+.play-screen.result-first .action-grid {
+  display: none;
+}
+
+.play-screen.result-first .actions-box .primary-button {
+  width: 100%;
+  min-height: 58px;
+  font-size: 18px;
 }
 
 .ghost-button {
@@ -1096,6 +1123,17 @@ button {
 }
 
 .ending-farmer {
+  --hat: #d7b35a;
+  --hat-light: #e8ca74;
+  --hair: #3a2520;
+  --skin: #f1c27a;
+  --skin-dark: #d99b63;
+  --shirt: #4f7f45;
+  --shirt-dark: #315a36;
+  --shirt-light: #f4f0d4;
+  --pants: #283a52;
+  --boots: #252525;
+  --tool: #7b5635;
   position: absolute;
   left: 22px;
   top: 28px;
@@ -1107,43 +1145,96 @@ button {
 
 .ending-farmer span {
   position: absolute;
-  left: 28px;
-  top: 8px;
-  width: 8px;
-  height: 8px;
-  background: #d7b35a;
+  left: 34px;
+  top: 6px;
+  width: 4px;
+  height: 4px;
+  background: var(--hat);
   box-shadow:
-    -8px 0 0 #d7b35a,
-    8px 0 0 #d7b35a,
-    -24px 8px 0 #d7b35a,
-    -16px 8px 0 #e6c66e,
-    -8px 8px 0 #e6c66e,
-    0 8px 0 #e6c66e,
-    8px 8px 0 #e6c66e,
-    16px 8px 0 #e6c66e,
-    24px 8px 0 #d7b35a,
-    -8px 16px 0 #3a2520,
-    0 16px 0 #f1c27a,
-    8px 16px 0 #f1c27a,
-    -8px 24px 0 #3a2520,
-    0 24px 0 #2d2d2d,
-    8px 24px 0 #f1c27a,
-    16px 24px 0 #2d2d2d,
-    -16px 32px 0 #315a36,
-    -8px 32px 0 #315a36,
-    0 32px 0 #f4f0d4,
-    8px 32px 0 #4f7f45,
-    16px 32px 0 #4f7f45,
-    24px 32px 0 #315a36,
-    -16px 40px 0 #315a36,
-    -8px 40px 0 #4f7f45,
-    0 40px 0 #4f7f45,
-    8px 40px 0 #315a36,
-    16px 40px 0 #315a36,
-    -8px 48px 0 #283a52,
-    8px 48px 0 #283a52,
-    -8px 56px 0 #252525,
-    8px 56px 0 #252525;
+    -4px 0 0 var(--hat),
+    4px 0 0 var(--hat),
+    -8px 4px 0 var(--hat),
+    -4px 4px 0 var(--hat-light),
+    0 4px 0 var(--hat-light),
+    4px 4px 0 var(--hat-light),
+    8px 4px 0 var(--hat),
+    -20px 8px 0 var(--hat),
+    -16px 8px 0 var(--hat-light),
+    -12px 8px 0 var(--hat-light),
+    -8px 8px 0 var(--hat-light),
+    -4px 8px 0 var(--hat-light),
+    0 8px 0 var(--hat-light),
+    4px 8px 0 var(--hat-light),
+    8px 8px 0 var(--hat-light),
+    12px 8px 0 var(--hat-light),
+    16px 8px 0 var(--hat-light),
+    20px 8px 0 var(--hat),
+    -8px 12px 0 var(--hair),
+    -4px 12px 0 var(--skin),
+    0 12px 0 var(--skin),
+    4px 12px 0 var(--skin),
+    8px 12px 0 var(--skin-dark),
+    -8px 16px 0 var(--hair),
+    -4px 16px 0 var(--skin),
+    0 16px 0 #2d2d2d,
+    4px 16px 0 var(--skin),
+    8px 16px 0 #2d2d2d,
+    12px 16px 0 var(--skin-dark),
+    -4px 20px 0 var(--skin),
+    0 20px 0 var(--skin),
+    4px 20px 0 var(--skin-dark),
+    -12px 24px 0 var(--shirt-dark),
+    -8px 24px 0 var(--shirt-dark),
+    -4px 24px 0 var(--shirt),
+    0 24px 0 var(--shirt-light),
+    4px 24px 0 var(--shirt),
+    8px 24px 0 var(--shirt),
+    12px 24px 0 var(--shirt-dark),
+    -16px 28px 0 var(--skin),
+    -12px 28px 0 var(--shirt-dark),
+    -8px 28px 0 var(--shirt),
+    -4px 28px 0 var(--shirt),
+    0 28px 0 var(--shirt-light),
+    4px 28px 0 var(--shirt),
+    8px 28px 0 var(--shirt-dark),
+    12px 28px 0 var(--shirt-dark),
+    16px 28px 0 var(--skin),
+    -16px 32px 0 var(--skin-dark),
+    -8px 32px 0 var(--shirt-dark),
+    -4px 32px 0 var(--shirt),
+    0 32px 0 var(--shirt),
+    4px 32px 0 var(--shirt),
+    8px 32px 0 var(--shirt-dark),
+    16px 32px 0 var(--skin-dark),
+    -8px 36px 0 var(--pants),
+    -4px 36px 0 var(--pants),
+    4px 36px 0 var(--pants),
+    8px 36px 0 var(--pants),
+    -8px 40px 0 var(--pants),
+    -4px 40px 0 var(--pants),
+    4px 40px 0 var(--pants),
+    8px 40px 0 var(--pants),
+    -8px 44px 0 var(--boots),
+    -4px 44px 0 var(--boots),
+    4px 44px 0 var(--boots),
+    8px 44px 0 var(--boots),
+    -20px 30px 0 var(--tool),
+    20px 30px 0 var(--tool);
+}
+
+.ending-farmer::before {
+  content: "";
+  position: absolute;
+  left: 48px;
+  top: 20px;
+  width: 4px;
+  height: 4px;
+  background: var(--tool);
+  box-shadow:
+    4px 4px 0 var(--tool),
+    8px 8px 0 var(--tool),
+    12px 12px 0 var(--tool),
+    16px 16px 0 var(--tool);
 }
 
 .ending-farmer::after {
@@ -1163,6 +1254,14 @@ button {
 .ending-community .ending-farmer::after { content: "縁"; }
 .ending-brand .ending-farmer::after { content: "銘"; color: var(--gold); }
 .ending-king .ending-farmer::after { content: "王"; color: var(--gold); }
+
+.ending-debt .ending-farmer { --hat: #7b5635; --hat-light: #a36e3e; --shirt: #8f4a41; --shirt-dark: #673238; --shirt-light: #f4d9cd; --pants: #3e3a45; --tool: #b85c38; }
+.ending-solid .ending-farmer { --hat: #d7b35a; --hat-light: #e8ca74; --shirt: #4f7f45; --shirt-dark: #315a36; --shirt-light: #f4f0d4; --pants: #283a52; --tool: #7b5635; }
+.ending-craft .ending-farmer { --hat: #c79a31; --hat-light: #f0cd63; --shirt: #2f7d45; --shirt-dark: #245f35; --shirt-light: #e9f5db; --pants: #2d405f; --tool: #6b5132; }
+.ending-business .ending-farmer { --hat: #3469a6; --hat-light: #72a7dd; --shirt: #1f4d7a; --shirt-dark: #1b3658; --shirt-light: #edf4fc; --pants: #1f2937; --tool: #d7b35a; }
+.ending-community .ending-farmer { --hat: #5fa35d; --hat-light: #a0d17c; --shirt: #2f7d45; --shirt-dark: #245f35; --shirt-light: #fff0b8; --pants: #34505f; --tool: #b85c38; }
+.ending-brand .ending-farmer { --hat: #b8791a; --hat-light: #f2c75a; --shirt: #8f6a22; --shirt-dark: #5f4a16; --shirt-light: #fff6cc; --pants: #2b3d4f; --tool: #c69a31; }
+.ending-king .ending-farmer { --hat: #f2c75a; --hat-light: #fff2a8; --shirt: #c2962d; --shirt-dark: #7d611a; --shirt-light: #fff8d8; --pants: #243c63; --tool: #f2c75a; }
 
 .harvest-grid span,
 .final-summary span {
@@ -1368,12 +1467,12 @@ button {
 @keyframes tapPulse {
   0%, 100% {
     transform: translateY(0) scale(1);
-    box-shadow: 0 0 0 0 rgba(47, 125, 69, 0.42), 0 10px 24px rgba(47, 125, 69, 0.2);
+    box-shadow: 0 0 0 0 rgba(216, 106, 46, 0.46), 0 10px 24px rgba(184, 92, 56, 0.24);
   }
 
   50% {
     transform: translateY(-1px) scale(1.045);
-    box-shadow: 0 0 0 8px rgba(47, 125, 69, 0), 0 14px 28px rgba(47, 125, 69, 0.3);
+    box-shadow: 0 0 0 10px rgba(216, 106, 46, 0), 0 14px 28px rgba(184, 92, 56, 0.36);
   }
 }
 
