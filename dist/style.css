@@ -1413,6 +1413,14 @@ button {
     overflow: visible;
   }
 
+  .play-screen.result-first {
+    grid-template-rows: minmax(158px, auto) auto minmax(86px, auto);
+    grid-template-areas:
+      "hud stage event"
+      "feedback feedback feedback"
+      "actions actions actions";
+  }
+
   .mobile-hud {
     display: grid;
     grid-area: hud;
@@ -1588,6 +1596,24 @@ button {
     min-width: 120px;
     padding: 0 14px;
     justify-self: end;
+  }
+
+  .play-screen.result-first .actions-box {
+    position: static;
+    display: grid;
+    grid-template-columns: 1fr;
+    padding: 8px;
+  }
+
+  .play-screen.result-first .actions-box h3,
+  .play-screen.result-first .action-grid {
+    display: none;
+  }
+
+  .play-screen.result-first .actions-box .primary-button {
+    width: 100%;
+    min-height: 48px;
+    justify-self: stretch;
   }
 
   .harvest-card,

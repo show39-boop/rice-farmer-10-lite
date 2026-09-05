@@ -945,6 +945,12 @@ function render() {
   dom.startScreen.classList.toggle("hidden", state.screen !== "start");
   dom.playScreen.classList.toggle("hidden", state.screen !== "play");
   dom.finalScreen.classList.toggle("hidden", state.screen !== "final");
+  const resultFirst =
+    state.screen === "play" &&
+    state.awaitingContinue &&
+    ((currentPeriod().id === 7 && state.harvestedThisYear) ||
+      (currentPeriod().id === 8 && state.settledThisYear));
+  dom.playScreen.classList.toggle("result-first", resultFirst);
   renderHeader();
   renderStats();
   renderMain();
