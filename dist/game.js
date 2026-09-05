@@ -642,6 +642,10 @@ function announceRicePrice() {
   addLog(currentPeriod().label, message);
   if (state.turnResult) {
     state.turnResult.event = "コメ価格の発表";
+    state.turnResult.ricePriceAnnouncement = {
+      label: state.price.label,
+      yen: state.price.yen
+    };
     state.turnResult.messages.push(message);
     state.turnResult.after = resultSnapshot();
   }
@@ -1136,12 +1140,19 @@ function renderTurnResultHtml(result) {
     return `<span class="${className}">${label} ${sign}${diff}${unit}</span>`;
   }).filter(Boolean).join("");
 
+  const announcement = result.ricePriceAnnouncement ? `
+    <div class="rice-price-announcement">
+      <span>コメ価格の発表</span>
+      <strong>${result.ricePriceAnnouncement.label} ${formatYen(result.ricePriceAnnouncement.yen)}円 / 60kg</strong>
+    </div>
+  ` : "";
   const messages = result.messages.map((message) => `<li>${message}</li>`).join("");
   return `
     <div class="turn-result-head">
       <strong>${result.period}</strong>
       <span>${result.action} / ${result.event}</span>
     </div>
+    ${announcement}
     <ul>${messages}</ul>
     <div class="delta-row">${deltas || "<span>大きな数値変化なし</span>"}</div>
   `;
@@ -1321,7 +1332,7 @@ function renderFinal() {
       <div class="ending-farmer" aria-hidden="true"><span></span></div>
       <span>あなたの農家人生</span>
       <strong>5年目終了</strong>
-      <p>平均利益: ${formatYen(averageProfit * 10000)}円 / 年<br>
+      <p>平均利益: ${averageProfit}万円 / 年<br>
       経営面積: ${formatArea(state.area)}町<br>
       平均収量: ${averageYield}kg / 10a<br>
       純資産: ${netWorth}万円<br>

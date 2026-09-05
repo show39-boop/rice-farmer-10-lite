@@ -919,6 +919,12 @@ button {
   background: rgba(255, 255, 255, 0.9);
 }
 
+.mobile-data-grid .mobile-rice-price-tile {
+  border-color: rgba(184, 121, 26, 0.42);
+  background: linear-gradient(135deg, #fff0ad, #f7fbe9);
+  box-shadow: 0 8px 18px rgba(184, 121, 26, 0.14);
+}
+
 .mobile-data-grid span {
   display: block;
   color: var(--muted);
@@ -931,6 +937,10 @@ button {
   margin-top: 3px;
   font-size: 14px;
   font-weight: 900;
+}
+
+.mobile-rice-price-tile strong {
+  color: #8f5200;
 }
 
 .season-cards {
@@ -947,6 +957,12 @@ button {
   background: var(--field);
 }
 
+.season-cards .rice-price-card {
+  border-color: rgba(184, 121, 26, 0.38);
+  background: linear-gradient(135deg, #fff4bf, #ecf5d8);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.58), 0 8px 18px rgba(184, 121, 26, 0.12);
+}
+
 .season-cards span {
   display: block;
   color: var(--muted);
@@ -957,6 +973,10 @@ button {
   display: block;
   margin-top: 6px;
   font-size: 18px;
+}
+
+.rice-price-card strong {
+  color: #8f5200;
 }
 
 .event-box {
@@ -1014,6 +1034,35 @@ button {
   background: var(--field);
   font-size: 13px;
   font-weight: 800;
+}
+
+.rice-price-announcement {
+  margin: 10px 0;
+  padding: 12px;
+  border: 2px solid rgba(184, 121, 26, 0.45);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 12% 16%, rgba(255, 255, 255, 0.9), transparent 34%),
+    linear-gradient(135deg, #fff0ad, #f8fbeb);
+  box-shadow: 0 10px 22px rgba(184, 121, 26, 0.15);
+}
+
+.rice-price-announcement span,
+.rice-price-announcement strong {
+  display: block;
+}
+
+.rice-price-announcement span {
+  color: #8f5200;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.rice-price-announcement strong {
+  margin-top: 4px;
+  color: var(--ink);
+  font-size: 20px;
+  line-height: 1.25;
 }
 
 .choice-row,
