@@ -1402,12 +1402,13 @@ button {
   .play-screen {
     min-height: calc(100svh - 34px);
     display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    grid-template-rows: auto minmax(112px, 0.72fr) minmax(120px, 1fr);
+    grid-template-columns: minmax(150px, 0.72fr) minmax(250px, 1fr) minmax(330px, 1.35fr);
+    grid-template-rows: minmax(158px, auto) minmax(104px, auto) auto;
     grid-template-areas:
-      "hud hud"
-      "stage event"
-      "actions actions";
+      "hud stage event"
+      "actions actions actions"
+      "feedback feedback feedback";
+    align-items: stretch;
     gap: 7px;
     overflow: visible;
   }
@@ -1415,13 +1416,52 @@ button {
   .mobile-hud {
     display: grid;
     grid-area: hud;
+    align-content: start;
+    gap: 6px;
+    padding: 7px;
+  }
+
+  .mobile-turn {
+    display: grid;
+    gap: 2px;
+    align-items: start;
+  }
+
+  .mobile-turn span {
+    font-size: 13px;
+    line-height: 1.2;
+  }
+
+  .mobile-turn strong {
+    font-size: 12px;
+  }
+
+  .mobile-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: row;
+    gap: 5px;
+  }
+
+  .mobile-stat-grid div {
+    min-height: 35px;
+    padding: 3px;
+  }
+
+  .mobile-stat-grid dt {
+    font-size: 10px;
+    line-height: 1.1;
+  }
+
+  .mobile-stat-grid dd {
+    font-size: 13px;
+    line-height: 1.15;
   }
 
   .dot-stage {
     grid-area: stage;
     height: 100%;
-    min-height: 112px;
-    max-height: 168px;
+    min-height: 158px;
+    max-height: none;
     margin-top: 0;
   }
 
@@ -1453,17 +1493,23 @@ button {
 
   .event-box {
     grid-area: event;
-    min-height: 0;
-    max-height: 168px;
+    min-height: 158px;
+    max-height: none;
     overflow: auto;
   }
 
   .actions-box {
     grid-area: actions;
+    position: sticky;
+    bottom: 0;
+    z-index: 9;
     display: grid;
     grid-template-columns: auto 1fr auto;
     gap: 8px;
     align-items: start;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.96);
   }
 
   .event-box h3,
@@ -1546,22 +1592,74 @@ button {
 
   .harvest-card,
   .settlement-card {
-    position: absolute;
-    inset: auto 14px 14px;
-    z-index: 8;
-    max-height: 82svh;
-    overflow: auto;
+    grid-area: feedback;
+    position: static;
+    max-height: none;
+    overflow: visible;
     margin-top: 0;
-    padding: 12px;
+    padding: 10px;
+  }
+
+  .harvest-card h3,
+  .settlement-card h3 {
+    font-size: 16px;
+  }
+
+  .stars {
+    margin: 4px 0 8px;
+    font-size: 22px;
+  }
+
+  .harvest-grid,
+  .final-summary {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .harvest-grid div {
+    min-height: 58px;
+    padding: 8px;
+  }
+
+  .harvest-grid span {
+    font-size: 11px;
+  }
+
+  .harvest-grid strong {
+    font-size: 16px;
+  }
+
+  .final-screen h2 {
+    font-size: 44px;
+  }
+}
+
+@media (max-width: 760px) and (orientation: landscape) {
+  .play-screen {
+    grid-template-columns: minmax(132px, 0.7fr) minmax(190px, 1fr) minmax(230px, 1.15fr);
+    grid-template-rows: minmax(142px, auto) minmax(104px, auto) auto;
+  }
+
+  .mobile-hud {
+    padding: 6px;
+  }
+
+  .mobile-stat-grid div {
+    min-height: 32px;
+  }
+
+  .dot-stage,
+  .event-box {
+    min-height: 142px;
+  }
+
+  .action-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .harvest-grid,
   .final-summary {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .final-screen h2 {
-    font-size: 44px;
   }
 }
 
