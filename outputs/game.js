@@ -715,6 +715,17 @@ function nextPeriod() {
     state.screen = "final";
   }
   render();
+  scrollGameToTop();
+}
+
+function scrollGameToTop() {
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    const shell = document.querySelector(".app-shell");
+    if (shell && typeof shell.scrollTo === "function") shell.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  });
 }
 
 function harvest() {
