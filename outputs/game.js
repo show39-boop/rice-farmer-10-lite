@@ -4,9 +4,11 @@ const MAX_YEARS = 5;
 const PERIODS_PER_YEAR = 8;
 const TOTAL_TURNS = MAX_YEARS * PERIODS_PER_YEAR;
 const BASE_YIELD_KG = 450;
+const ANNUAL_LABOR_HOURS = 1800;
+const ANNUAL_LIVING_COST = 240;
 const ACTION_POSITIVE_RATE = 1.2;
 const ACTION_NEGATIVE_RATE = 0.85;
-const TITLE_COUNT = 7;
+const TITLE_COUNT = 10;
 let actionBalanceActive = false;
 let previousRunLog = null;
 
@@ -394,8 +396,10 @@ function emptyYearState() {
     landEventsDone: [],
     extraActionsByPeriod: {},
     priceAnnounced: false,
+    forecastBeforeHarvest: null,
     sales: 0,
     expenses: 0,
+    agriculturalIncome: 0,
     profit: 0
   };
 }
@@ -415,8 +419,7 @@ function rememberPreviousRun() {
   const averageYield = state.harvests.length
     ? Math.round(state.harvests.reduce((sum, h) => sum + h.yieldKg, 0) / state.harvests.length)
     : 0;
-  const machineryAssets = Math.round(90 + state.area * 40 + state.machine * 2);
-  const netWorth = state.cash + machineryAssets - state.debt;
+  const netWorth = finalAssetSummary().netWorth;
   previousRunLog = {
     title: state.harvests.length ? judgeTitle(netWorth, averageYield) : "途中終了",
     summary: state.settlements.length
@@ -715,6 +718,7 @@ function nextPeriod() {
 }
 
 function harvest() {
+  const forecastBeforeHarvest = forecastYield();
   const weatherBonus = weatherYieldBonus();
   const skillBonus = (state.cultivation - 30) * 2;
   const positiveBonus = positivePart(weatherBonus) + positivePart(skillBonus) + positivePart(state.yearData.yieldBonus);
@@ -730,7 +734,16 @@ function harvest() {
   const bales = (yieldKg / 60) * state.area * 10;
   const sales = Math.round((bales * price) / 10000);
   state.yearData.sales = sales;
-  state.lastHarvest = { year: state.year, yieldKg, price, sales, area: state.area };
+  state.yearData.forecastBeforeHarvest = forecastBeforeHarvest;
+  state.lastHarvest = {
+    year: state.year,
+    yieldKg,
+    forecastYieldKg: forecastBeforeHarvest,
+    yieldDelta: yieldKg - forecastBeforeHarvest,
+    price,
+    sales,
+    area: state.area
+  };
   state.harvests.push(state.lastHarvest);
   addLog("収穫", `収量${yieldKg}kg、売上${sales}万円。`);
 }
@@ -739,36 +752,55 @@ function settleYear() {
   if (!state.lastHarvest || state.lastHarvest.year !== state.year) harvest();
   const expenses = annualExpenses();
   state.yearData.expenses = expenses;
-  const profit = state.yearData.sales - expenses - state.yearData.eventCost - state.yearData.repairCost;
-  state.yearData.profit = profit;
-  state.cash += state.yearData.sales - expenses;
+  const agriculturalIncome = agriculturalIncomeFor({
+    sales: state.yearData.sales,
+    expenses,
+    eventCost: state.yearData.eventCost
+  });
+  const annualCashChange = annualCashChangeFor({
+    agriculturalIncome,
+    livingCost: ANNUAL_LIVING_COST,
+    equipmentCost: state.yearData.repairCost
+  });
+  state.yearData.agriculturalIncome = agriculturalIncome;
+  state.yearData.profit = agriculturalIncome;
+  state.cash += state.yearData.sales - expenses - ANNUAL_LIVING_COST;
   borrowIfNeeded();
   autoRepay();
   const settlement = {
     year: state.year,
     sales: state.yearData.sales,
     expenses,
+    expensePer10a: expensePer10a(expenses, state.area),
     eventCost: state.yearData.eventCost,
     repairCost: state.yearData.repairCost,
-    profit,
+    equipmentCost: state.yearData.repairCost,
+    agriculturalIncome,
+    profit: agriculturalIncome,
+    livingCost: ANNUAL_LIVING_COST,
+    annualCashChange,
+    laborHours: ANNUAL_LABOR_HOURS,
+    hourlyWage: effectiveHourlyWage(agriculturalIncome),
     cash: state.cash,
     debt: state.debt,
     area: state.area,
-    yieldKg: state.lastHarvest.yieldKg
+    yieldKg: state.lastHarvest.yieldKg,
+    forecastYieldKg: state.lastHarvest.forecastYieldKg,
+    yieldDelta: state.lastHarvest.yieldDelta
   };
   settlement.comment = settlementComment(settlement);
   state.lastSettlement = settlement;
   state.settlements.push(settlement);
   addTimeline(settlement);
-  addLog("決算", `${state.year}年目利益${profit}万円。${settlement.comment}`);
+  addLog("決算", `${state.year}年目農業所得${agriculturalIncome}万円。${settlement.comment}`);
 }
 
 function settlementComment(settlement) {
-  if (settlement.profit >= 650 && settlement.debt <= 0) return "米も財布もよく実った。";
-  if (settlement.profit >= 350 && settlement.area >= 7) return "労働時間は見なかったことにして、今年も伸びた。";
-  if (settlement.profit >= 150) return "ちゃんと前に進んだ一年。えらい。";
-  if (settlement.profit >= 0 && settlement.debt >= 800) return "今年もなんとか生き残った。";
-  if (settlement.profit >= 0) return "黒字。拍手は小さめ、でも本物。";
+  if (settlement.agriculturalIncome >= 650 && settlement.debt <= 0) return "米も財布もよく実った。";
+  if (settlement.agriculturalIncome >= 350 && settlement.area >= 7) return "労働時間は見なかったことにして、今年も伸びた。";
+  if (settlement.agriculturalIncome >= 150) return "ちゃんと前に進んだ一年。えらい。";
+  if (settlement.agriculturalIncome >= 0 && settlement.debt >= 800) return "今年もなんとか生き残った。";
+  if (settlement.agriculturalIncome >= 0) return "黒字。拍手は小さめ、でも本物。";
   if (settlement.debt >= 1000) return "借金は増えたが、田んぼは逃げていない。";
   return "反省点は多い。でも来年の田んぼはまだある。";
 }
@@ -783,14 +815,51 @@ function addTimeline(settlement) {
   if (newAbility) notes.push(`${abilityName(newAbility)}を武器にする`);
   state.timeline.push({
     year: settlement.year,
-    text: notes[0] || `収量${settlement.yieldKg}kg、利益${settlement.profit}万円`
+    text: notes[0] || `収量${settlement.yieldKg}kg、農業所得${settlement.agriculturalIncome}万円`
   });
 }
 
-function annualExpenses() {
-  const base = state.area * 50 + 30;
-  const discount = hasAbility(state, "numbers") ? 0.9 : 1;
+function annualExpenses(s = state) {
+  const basePer10a = s.area >= 8 ? 5.2 : s.area >= 5 ? 5.5 : 6;
+  const base = s.area * 10 * basePer10a;
+  const discount = hasAbility(s, "numbers") ? 0.9 : 1;
   return Math.round(base * discount);
+}
+
+function agriculturalIncomeFor(data) {
+  return Math.round(data.sales - data.expenses - data.eventCost);
+}
+
+function settlementAgriculturalIncome(settlement) {
+  return settlement.agriculturalIncome ?? settlement.profit ?? 0;
+}
+
+function annualCashChangeFor(data) {
+  return Math.round(data.agriculturalIncome - data.livingCost - data.equipmentCost);
+}
+
+function expensePer10a(expenses, area) {
+  const units = Math.max(1, area * 10);
+  return Math.round((expenses / units) * 10) / 10;
+}
+
+function effectiveHourlyWage(agriculturalIncome) {
+  return Math.round((agriculturalIncome * 10000) / ANNUAL_LABOR_HOURS);
+}
+
+function settlementExpensePer10a(settlement) {
+  return settlement.expensePer10a ?? expensePer10a(settlement.expenses ?? 0, settlement.area ?? state.area);
+}
+
+function finalAssetSummary(s = state) {
+  const equipment = Math.round(90 + s.area * 40 + s.machine * 2);
+  return {
+    cash: s.cash,
+    equipment,
+    other: 0,
+    debt: s.debt,
+    netWorth: s.cash + equipment - s.debt
+  };
 }
 
 function finalRicePrice() {
@@ -1247,11 +1316,13 @@ function renderHarvest() {
   const show = h && h.year === state.year && state.harvestedThisYear;
   dom.harvestCard.classList.toggle("hidden", !show);
   if (!show) return;
+  const forecastYieldKg = h.forecastYieldKg ?? h.yieldKg;
+  const yieldDelta = h.yieldDelta ?? 0;
   dom.harvestCard.innerHTML = `
     <h3>${h.year}年目 収穫!</h3>
     <div class="stars">${yieldStars(h.yieldKg)}</div>
     <div class="harvest-grid">
-      <div><span>今年の収量</span><strong>${h.yieldKg}kg / 10a</strong></div>
+      <div class="yield-compare wide"><span>収量</span><strong>予想${forecastYieldKg} → 実績${h.yieldKg}kg / 10a</strong><small class="${yieldDelta >= 0 ? "positive" : "negative"}">${signedNumber(yieldDelta)}kg / 10a</small></div>
       <div><span>米価</span><strong>${formatYen(h.price)}円 / 60kg</strong></div>
       <div><span>経営面積</span><strong>${formatArea(h.area)}町</strong></div>
       <div><span>売上</span><strong>${h.sales}万円!</strong></div>
@@ -1263,14 +1334,30 @@ function renderSettlement() {
   const show = y && y.year === state.year && state.settledThisYear;
   dom.settlementCard.classList.toggle("hidden", !show);
   if (!show) return;
+  const agriculturalIncome = settlementAgriculturalIncome(y);
+  const expenseUnit = settlementExpensePer10a(y);
+  const equipmentCost = y.equipmentCost ?? y.repairCost ?? 0;
+  const livingCost = y.livingCost ?? ANNUAL_LIVING_COST;
+  const annualCashChange = y.annualCashChange ?? annualCashChangeFor({ agriculturalIncome, livingCost, equipmentCost });
+  const laborHours = y.laborHours ?? ANNUAL_LABOR_HOURS;
+  const hourlyWage = y.hourlyWage ?? effectiveHourlyWage(agriculturalIncome);
+  const forecastYieldKg = y.forecastYieldKg ?? y.yieldKg;
+  const yieldDelta = y.yieldDelta ?? 0;
   dom.settlementCard.innerHTML = `
     <h3>${y.year}年目 決算</h3>
     <p class="settlement-comment">${y.comment}</p>
     <div class="harvest-grid">
+      <div class="yield-compare wide"><span>収量</span><strong>予想${forecastYieldKg} → 実績${y.yieldKg}kg / 10a</strong><small class="${yieldDelta >= 0 ? "positive" : "negative"}">天候等による変化 ${signedNumber(yieldDelta)}kg / 10a</small></div>
       <div><span>売上</span><strong>${y.sales}万円</strong></div>
-      <div><span>経費</span><strong>${y.expenses}万円</strong></div>
+      <div><span>年間経費</span><strong>${y.expenses}万円</strong></div>
+      <div><span>10a当たり経費</span><strong>${expenseUnit}万円 / 10a</strong></div>
       <div><span>イベント費用</span><strong>${y.eventCost}万円</strong></div>
-      <div><span>年間利益</span><strong class="${y.profit >= 0 ? "positive" : "negative"}">${y.profit}万円</strong></div>
+      <div><span>設備投資・修理</span><strong>${equipmentCost}万円</strong></div>
+      <div><span>農業所得</span><strong class="${agriculturalIncome >= 0 ? "positive" : "negative"}">${agriculturalIncome}万円</strong></div>
+      <div><span>年間労働時間</span><strong>${formatNumber(laborHours)}時間</strong></div>
+      <div><span>実質時給</span><strong class="${hourlyWage >= 1000 ? "positive" : "negative"}">${formatNumber(hourlyWage)}円</strong></div>
+      <div><span>生活費</span><strong>${livingCost}万円</strong></div>
+      <div><span>年間資金増減</span><strong class="${annualCashChange >= 0 ? "positive" : "negative"}">${signedNumber(annualCashChange)}万円</strong></div>
       <div><span>資金</span><strong>${y.cash}万円</strong></div>
       <div><span>借金</span><strong>${y.debt}万円</strong></div>
     </div>`;
@@ -1317,14 +1404,17 @@ function renderFinal() {
   const averageYield = Math.round(state.harvests.reduce((sum, h) => sum + h.yieldKg, 0) / state.harvests.length);
   const maxYield = Math.max(...state.harvests.map((h) => h.yieldKg));
   const totalSales = state.harvests.reduce((sum, h) => sum + h.sales, 0);
-  const machineryAssets = Math.round(90 + state.area * 40 + state.machine * 2);
-  const netWorth = state.cash + machineryAssets - state.debt;
+  const totalAgriculturalIncome = state.settlements.reduce((sum, y) => sum + settlementAgriculturalIncome(y), 0);
+  const assets = finalAssetSummary();
+  const netWorth = assets.netWorth;
   const title = judgeTitle(netWorth, averageYield);
   const averageSales = Math.round(totalSales / state.harvests.length);
-  const averageExpenses = Math.round(state.settlements.reduce((sum, y) => sum + y.expenses + y.eventCost + y.repairCost, 0) / state.settlements.length);
-  const averageProfit = Math.round(state.settlements.reduce((sum, y) => sum + y.profit, 0) / state.settlements.length);
+  const averageExpenses = Math.round(state.settlements.reduce((sum, y) => sum + y.expenses, 0) / state.settlements.length);
+  const averageExpensePer10a = round1(state.settlements.reduce((sum, y) => sum + settlementExpensePer10a(y), 0) / state.settlements.length);
+  const averageAgriculturalIncome = Math.round(totalAgriculturalIncome / state.settlements.length);
+  const averageHourlyWage = Math.round((totalAgriculturalIncome * 10000) / (ANNUAL_LABOR_HOURS * MAX_YEARS));
   const titleKey = titleClass(title);
-  const punchline = titlePunchline(title, { averageProfit, netWorth });
+  const punchline = titlePunchline(title, { averageAgriculturalIncome, netWorth });
   dom.finalScreen.className = `final-screen ending-${titleKey}`;
   dom.finalTitleCount.textContent = `称号 全${TITLE_COUNT}種類`;
   dom.finalTitle.textContent = `「${title}」`;
@@ -1333,26 +1423,36 @@ function renderFinal() {
       <div class="ending-farmer" aria-hidden="true"><span></span></div>
       <span>あなたの農家人生</span>
       <strong>5年目終了</strong>
-      <p>平均利益: ${averageProfit}万円 / 年<br>
-      経営面積: ${formatArea(state.area)}町<br>
-      平均収量: ${averageYield}kg / 10a<br>
+      <p>平均農業所得: ${averageAgriculturalIncome}万円 / 年<br>
+      最終経営面積: ${formatArea(state.area)}町<br>
+      5年平均収量: ${averageYield}kg / 10a<br>
       純資産: ${netWorth}万円<br>
       借金: ${state.debt}万円</p>
       <span>称号</span>
       <strong>「${title}」</strong>
       <p class="ending-joke">${punchline}</p>
     </div>
-    <div><span>純資産</span><strong>${netWorth}万円</strong></div>
-    <div><span>現金</span><strong>${state.cash}万円</strong></div>
-    <div><span>借金</span><strong>${state.debt}万円</strong></div>
-    <div><span>経営面積</span><strong>${formatArea(state.area)}町</strong></div>
-    <div><span>5年間平均収量</span><strong>${averageYield}kg / 10a</strong></div>
+    <div><span>5年間プレイ結果</span><strong>5年間・40ターン完走</strong></div>
+    <div><span>最終経営面積</span><strong>${formatArea(state.area)}町</strong></div>
+    <div><span>5年平均収量</span><strong>${averageYield}kg / 10a</strong></div>
     <div><span>最大収量</span><strong>${maxYield}kg / 10a</strong></div>
     <div><span>5年間総売上</span><strong>${totalSales}万円</strong></div>
-    <div><span>平均売上</span><strong>${averageSales}万円 / 年</strong></div>
-    <div><span>平均経費</span><strong>${averageExpenses}万円 / 年</strong></div>
-    <div><span>平均利益</span><strong class="${averageProfit >= 0 ? "positive" : "negative"}">${averageProfit}万円 / 年</strong></div>
-    <div><span>能力</span><strong>栽培${state.cultivation} / 経営${state.management} / 体力${state.stamina} / 信用${state.trust}</strong></div>
+    <div><span>平均売上 / 年</span><strong>${averageSales}万円</strong></div>
+    <div><span>平均経費 / 年</span><strong>${averageExpenses}万円</strong></div>
+    <div><span>平均10a当たり経費</span><strong>${averageExpensePer10a}万円 / 10a</strong></div>
+    <div><span>平均農業所得 / 年</span><strong class="${averageAgriculturalIncome >= 0 ? "positive" : "negative"}">${averageAgriculturalIncome}万円</strong></div>
+    <div><span>5年間農業所得合計</span><strong class="${totalAgriculturalIncome >= 0 ? "positive" : "negative"}">${totalAgriculturalIncome}万円</strong></div>
+    <div><span>年間労働時間</span><strong>${formatNumber(ANNUAL_LABOR_HOURS)}時間</strong></div>
+    <div><span>5年間平均実質時給</span><strong class="${averageHourlyWage >= 1000 ? "positive" : "negative"}">${formatNumber(averageHourlyWage)}円</strong></div>
+    <div><span>最終現金</span><strong>${state.cash}万円</strong></div>
+    <div><span>純資産</span><strong>${netWorth}万円</strong></div>
+    <div class="wide net-worth-breakdown"><span>純資産内訳</span><strong>現金 ${assets.cash}万円 / 農機・設備 ${assets.equipment}万円 / 借金 ${assets.debt}万円</strong></div>
+    <div><span>借金</span><strong>${state.debt}万円</strong></div>
+    <div><span>体力</span><strong>${state.stamina}</strong></div>
+    <div><span>農機コンディション</span><strong>${state.machine}</strong></div>
+    <div><span>信用</span><strong>${state.trust}</strong></div>
+    <div><span>栽培力</span><strong>${state.cultivation}</strong></div>
+    <div><span>経営力</span><strong>${state.management}</strong></div>
     <div class="wide"><span>特殊能力</span><strong>${state.abilities.map(abilityName).join("、") || "なし"}</strong></div>
     <div class="wide timeline"><span>あなたの5年間</span><strong>${state.timeline.map((t) => `${t.year}年目: ${t.text}`).join("<br>")}</strong></div>`;
 }
@@ -1365,7 +1465,11 @@ function titleClass(title) {
     "岡山のやり手農家": "business",
     "地域の担い手": "community",
     "岡山のブランド農家": "brand",
-    "岡山の米王": "king"
+    "岡山の米王": "king",
+    "攻めすぎ経営者": "business",
+    "堅実経営農家": "solid",
+    "高収量農家": "craft",
+    "持続可能農家": "community"
   };
   return map[title] || "solid";
 }
@@ -1378,19 +1482,25 @@ function titlePunchline(title) {
     "岡山のやり手農家": "計算機を叩く音とコンバインの音が同じくらい大きい。",
     "地域の担い手": "頼られすぎて、軽トラの予定表が田植え機より過密。",
     "岡山のブランド農家": "米に名前がついた。本人の休みにはまだ名前がない。",
-    "岡山の米王": "もはや米袋が名刺。肩書きが少し重い。"
+    "岡山の米王": "もはや米袋が名刺。肩書きが少し重い。",
+    "攻めすぎ経営者": "伸ばした面積ぶん、来年の段取り表も伸びている。",
+    "堅実経営農家": "派手さより安定。田んぼも家計もちゃんと回した。",
+    "高収量農家": "一粒ずつ詰めた努力が、数字にそのまま出た。",
+    "持続可能農家": "続けられる強さを作った。これはかなり大きい。"
   };
   return lines[title] || "今年もなんとか生き残った。";
 }
 
 function finalResultText() {
   const averageYield = Math.round(state.harvests.reduce((sum, h) => sum + h.yieldKg, 0) / state.harvests.length);
-  const averageProfit = Math.round(state.settlements.reduce((sum, y) => sum + y.profit, 0) / state.settlements.length);
-  const machineryAssets = Math.round(90 + state.area * 40 + state.machine * 2);
-  const netWorth = state.cash + machineryAssets - state.debt;
+  const totalAgriculturalIncome = state.settlements.reduce((sum, y) => sum + settlementAgriculturalIncome(y), 0);
+  const averageAgriculturalIncome = Math.round(totalAgriculturalIncome / state.settlements.length);
+  const averageHourlyWage = Math.round((totalAgriculturalIncome * 10000) / (ANNUAL_LABOR_HOURS * MAX_YEARS));
+  const assets = finalAssetSummary();
+  const netWorth = assets.netWorth;
   const title = judgeTitle(netWorth, averageYield);
-  const punchline = titlePunchline(title, { averageProfit, netWorth });
-  return `米農家10年 LITE\n\nあなたの農家人生\n5年目終了\n平均利益: ${averageProfit}万円 / 年\n経営面積: ${formatArea(state.area)}町\n平均収量: ${averageYield}kg / 10a\n純資産: ${netWorth}万円\n借金: ${state.debt}万円\n\n称号\n「${title}」\n${punchline}`;
+  const punchline = titlePunchline(title, { averageAgriculturalIncome, netWorth });
+  return `米農家10年 LITE\n\nあなたの農家人生\n5年目終了\n平均農業所得: ${averageAgriculturalIncome}万円 / 年\n5年間平均実質時給: ${formatNumber(averageHourlyWage)}円\n最終経営面積: ${formatArea(state.area)}町\n5年平均収量: ${averageYield}kg / 10a\n純資産: ${netWorth}万円\n内訳: 現金${assets.cash}万円 / 農機・設備${assets.equipment}万円 / 借金${assets.debt}万円\n\n称号\n「${title}」\n${punchline}`;
 }
 
 async function shareFinalResult() {
@@ -1408,10 +1518,18 @@ async function shareFinalResult() {
 }
 
 function judgeTitle(netWorth, averageYield) {
-  if (state.area >= 8 && netWorth >= 3000 && averageYield >= 500 && state.trust >= 75) return "岡山の米王";
   if (state.debt >= 900 || netWorth < 200) return "借金まみれ農家";
-  if (hasAbility(state, "brandRice") || (state.trust >= 70 && state.cultivation >= 65)) return "岡山のブランド農家";
-  if (state.area >= 7 && state.trust >= 60) return "地域の担い手";
+  const averageAgriculturalIncome = state.settlements.length
+    ? Math.round(state.settlements.reduce((sum, y) => sum + settlementAgriculturalIncome(y), 0) / state.settlements.length)
+    : 0;
+  const overloaded = state.area >= 10 && (state.stamina < 45 || state.machine < 45 || averageYield < 470);
+  if (overloaded) return "攻めすぎ経営者";
+  if (state.area >= 8 && netWorth >= 3000 && averageYield >= 510 && state.trust >= 78 && state.stamina >= 55 && state.machine >= 55 && averageAgriculturalIncome >= 300) return "岡山の米王";
+  if (state.area >= 7 && averageYield >= 500 && state.trust >= 70 && state.stamina >= 60 && state.machine >= 60 && averageAgriculturalIncome >= 220) return "持続可能農家";
+  if (state.area >= 6.5 && averageYield >= 490 && averageAgriculturalIncome >= 180 && state.debt <= 500) return "堅実経営農家";
+  if (averageYield >= 515 && state.cultivation >= 65) return "高収量農家";
+  if (hasAbility(state, "brandRice") || (state.trust >= 70 && state.cultivation >= 65 && averageAgriculturalIncome >= 120)) return "岡山のブランド農家";
+  if (state.area >= 7 && state.trust >= 60 && averageAgriculturalIncome >= 80) return "地域の担い手";
   if (netWorth >= 2300) return "岡山のやり手農家";
   if (averageYield >= 500) return "米作り職人";
   return "立派な米農家";
@@ -1466,6 +1584,14 @@ function formatArea(value) {
 
 function formatYen(value) {
   return value.toLocaleString("ja-JP");
+}
+
+function formatNumber(value) {
+  return value.toLocaleString("ja-JP");
+}
+
+function signedNumber(value) {
+  return `${value > 0 ? "+" : ""}${value}`;
 }
 
 function last(items) {

@@ -1377,6 +1377,22 @@ button {
   font-size: 19px;
 }
 
+.harvest-grid .yield-compare {
+  border-color: rgba(52, 105, 166, 0.28);
+  background: linear-gradient(135deg, #f4f8ff, #ffffff);
+}
+
+.yield-compare small {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.net-worth-breakdown strong {
+  line-height: 1.5;
+}
+
 .final-summary .wide {
   grid-column: 1 / -1;
 }
