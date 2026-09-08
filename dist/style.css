@@ -292,13 +292,22 @@ button {
   grid-template-columns: 1fr;
 }
 
-.screen-start .main-panel {
+.screen-start .app-shell {
+  width: 100%;
+  min-height: 100svh;
   padding: 0;
+}
+
+.screen-start .main-panel {
+  min-height: 100svh;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
   overflow: hidden;
 }
 
 .title-screen {
-  min-height: min(760px, calc(100vh - 44px));
+  min-height: 100svh;
   justify-content: stretch;
   gap: 0;
 }
@@ -796,6 +805,386 @@ button {
   font-size: 11px;
   font-weight: 1000;
   box-shadow: 0 3px 0 rgba(49, 71, 55, 0.12);
+}
+
+.title-hero {
+  min-height: inherit;
+  display: grid;
+  grid-template-columns: 1fr;
+  place-items: start center;
+  padding: clamp(28px, 6vw, 74px) clamp(20px, 5vw, 72px);
+  background: linear-gradient(#73c9f4 0 38%, #9bd85d 38% 100%);
+}
+
+.title-copy {
+  width: min(760px, 100%);
+  min-height: 0;
+  z-index: 10;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  padding: clamp(8px, 1.5vw, 16px);
+  background: none;
+  text-align: center;
+}
+
+.title-copy::before {
+  content: none;
+}
+
+.title-screen h2 {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  max-width: none;
+  color: #173926;
+  font-size: clamp(52px, 8vw, 112px);
+  line-height: 0.92;
+  -webkit-text-stroke: 1px rgba(255, 244, 151, 0.82);
+  text-shadow:
+    0 4px 0 #ffe46e,
+    0 8px 0 rgba(36, 88, 43, 0.18),
+    0 18px 28px rgba(20, 66, 38, 0.18),
+    0 0 18px rgba(255, 255, 255, 0.9);
+}
+
+.title-screen h2 span {
+  display: block;
+}
+
+.title-screen h2 strong {
+  display: inline-block;
+  padding: 6px 28px 8px;
+  border: 3px solid rgba(255, 255, 255, 0.92);
+  border-radius: 10px;
+  background: linear-gradient(180deg, #39a951, #237a3d);
+  color: #fff477;
+  font-size: clamp(25px, 3vw, 42px);
+  letter-spacing: 0;
+  text-shadow: 0 3px 0 rgba(22, 72, 35, 0.42);
+  box-shadow: 0 7px 0 rgba(22, 72, 35, 0.24);
+}
+
+.title-subcopy {
+  max-width: 720px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #153623;
+  font-size: clamp(19px, 2.2vw, 29px);
+  font-weight: 1000;
+  line-height: 1.45;
+  text-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.88),
+    0 0 12px rgba(255, 255, 255, 0.95);
+}
+
+.title-badges {
+  justify-content: center;
+  gap: 10px;
+}
+
+.title-badges span {
+  padding: 11px 16px;
+  border: 2px solid rgba(37, 104, 51, 0.26);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #1f5c34;
+  font-size: 15px;
+  box-shadow: 0 8px 0 rgba(47, 94, 43, 0.1);
+}
+
+.start-button {
+  position: relative;
+  z-index: 12;
+  width: min(360px, 100%);
+  min-height: 70px;
+  margin-top: 4px;
+  border: 3px solid rgba(255, 255, 255, 0.72);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #33a457, #237f43);
+  color: white;
+  font-size: 24px;
+  font-weight: 1000;
+  box-shadow:
+    0 8px 0 #155f34,
+    0 22px 34px rgba(21, 94, 49, 0.28);
+}
+
+.title-field-scene {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  display: block;
+  padding: 0;
+  overflow: hidden;
+  background:
+    linear-gradient(#6fc7f3 0 32%, #9edb66 32% 55%, #69bd4a 55% 100%);
+}
+
+.title-field-scene::before {
+  z-index: 8;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.06) 50%, transparent 50%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 50%, transparent 50%);
+  background-size: 6px 6px;
+  mix-blend-mode: soft-light;
+}
+
+.title-field-scene::after {
+  content: "";
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -6%;
+  z-index: 2;
+  height: 38%;
+  background:
+    linear-gradient(10deg, rgba(255, 218, 77, 0.72), transparent 22%) 0 82% / 220px 90px repeat-x,
+    repeating-linear-gradient(96deg, rgba(247, 211, 61, 0.95) 0 8px, rgba(74, 157, 59, 0.7) 8px 19px, rgba(43, 132, 57, 0.72) 19px 34px);
+  transform: skewY(-2deg);
+  animation: riceWave 5.5s ease-in-out infinite;
+}
+
+.world-sky,
+.world-mountains,
+.world-village,
+.world-field,
+.world-rice,
+.world-farmer,
+.world-tractor {
+  position: absolute;
+}
+
+.world-sky {
+  inset: 0 0 45%;
+}
+
+.world-sky::after {
+  content: "";
+  position: absolute;
+  right: 8%;
+  top: 13%;
+  width: 22px;
+  height: 12px;
+  border-top: 3px solid rgba(255, 255, 255, 0.92);
+  border-radius: 50%;
+  box-shadow: 28px 12px 0 -2px rgba(255, 255, 255, 0.9), 58px -2px 0 -3px rgba(255, 255, 255, 0.9);
+}
+
+.world-sky .title-cloud {
+  width: clamp(92px, 12vw, 170px);
+  height: clamp(25px, 3vw, 44px);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow:
+    28px -13px 0 rgba(255, 255, 255, 0.95),
+    62px 0 0 rgba(255, 255, 255, 0.86),
+    -18px 5px 0 rgba(255, 255, 255, 0.74);
+}
+
+.world-sky .title-cloud-a {
+  left: 6%;
+  top: 12%;
+  animation-duration: 18s;
+}
+
+.world-sky .title-cloud-b {
+  right: 18%;
+  top: 9%;
+  opacity: 0.82;
+  animation-duration: 23s;
+}
+
+.title-cloud-c {
+  left: 56%;
+  top: 24%;
+  opacity: 0.72;
+  transform: scale(0.72);
+  animation: titleCloud 28s linear infinite reverse;
+}
+
+.world-mountains {
+  left: -8%;
+  right: -8%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.world-mountains-back {
+  top: 22%;
+  height: 220px;
+  background:
+    linear-gradient(135deg, transparent 0 38%, #427e68 38% 56%, transparent 56%) 0 0 / 260px 100% repeat-x,
+    linear-gradient(45deg, transparent 0 38%, #4c9367 38% 57%, transparent 57%) 112px 22px / 310px 100% repeat-x;
+  opacity: 0.72;
+}
+
+.world-mountains-front {
+  top: 29%;
+  height: 190px;
+  background:
+    linear-gradient(135deg, transparent 0 39%, #2f7d45 39% 57%, transparent 57%) 30px 0 / 210px 100% repeat-x,
+    linear-gradient(45deg, transparent 0 40%, #5aa454 40% 58%, transparent 58%) 140px 30px / 250px 100% repeat-x;
+  opacity: 0.9;
+}
+
+.world-village {
+  left: 0;
+  right: 0;
+  top: 43%;
+  z-index: 2;
+  height: 120px;
+}
+
+.village-house {
+  position: absolute;
+  bottom: 12px;
+  width: 92px;
+  height: 62px;
+  background:
+    linear-gradient(135deg, transparent 0 38%, #986030 38% 64%, transparent 64%) 0 0 / 92px 38px no-repeat,
+    linear-gradient(#f0d197 0 0) 13px 28px / 66px 34px no-repeat,
+    linear-gradient(#624326 0 0) 40px 41px / 16px 21px no-repeat;
+  filter: drop-shadow(0 8px 0 rgba(36, 84, 42, 0.18));
+}
+
+.village-house-a { left: 9%; }
+.village-house-b { right: 23%; transform: scale(0.82); }
+
+.okayama-castle {
+  position: absolute;
+  right: 8%;
+  bottom: 8px;
+  width: 86px;
+  height: 116px;
+  background:
+    linear-gradient(135deg, transparent 0 35%, #1c2630 35% 65%, transparent 65%) 9px 0 / 68px 28px no-repeat,
+    linear-gradient(#ffffff 0 0) 20px 25px / 46px 22px no-repeat,
+    linear-gradient(135deg, transparent 0 34%, #1c2630 34% 66%, transparent 66%) 0 38px / 86px 28px no-repeat,
+    linear-gradient(#f7f7ef 0 0) 12px 62px / 62px 26px no-repeat,
+    linear-gradient(#1c2630 0 0) 20px 88px / 46px 22px no-repeat;
+  filter: drop-shadow(0 9px 0 rgba(29, 69, 38, 0.16));
+}
+
+.world-field {
+  left: -5%;
+  right: -5%;
+  bottom: 9%;
+  z-index: 2;
+  height: 38%;
+  background:
+    repeating-linear-gradient(0deg, rgba(39, 111, 45, 0.42) 0 7px, transparent 7px 36px),
+    repeating-linear-gradient(90deg, rgba(92, 186, 76, 0.78) 0 22px, rgba(174, 222, 88, 0.8) 22px 46px),
+    #67bf51;
+  transform: skewY(-4deg);
+  box-shadow: inset 0 20px 0 rgba(255, 255, 255, 0.14);
+}
+
+.world-field span {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  height: 10px;
+  background: repeating-linear-gradient(90deg, #1e7c3a 0 5px, transparent 5px 31px);
+  filter: drop-shadow(0 4px 0 rgba(242, 215, 72, 0.56));
+  animation: riceWave 4.5s ease-in-out infinite;
+}
+
+.world-field span:nth-child(1) { top: 10%; }
+.world-field span:nth-child(2) { top: 25%; animation-delay: -0.8s; }
+.world-field span:nth-child(3) { top: 40%; animation-delay: -1.5s; }
+.world-field span:nth-child(4) { top: 55%; animation-delay: -2.2s; }
+.world-field span:nth-child(5) { top: 70%; animation-delay: -3s; }
+.world-field span:nth-child(6) { top: 85%; animation-delay: -3.8s; }
+
+.world-rice {
+  z-index: 5;
+  bottom: -4%;
+  width: clamp(120px, 22vw, 280px);
+  height: clamp(140px, 24vw, 310px);
+  background:
+    linear-gradient(65deg, transparent 0 47%, #e9bf32 47% 54%, transparent 54%) 10% 12% / 34px 68px repeat,
+    linear-gradient(-60deg, transparent 0 47%, #f5dc67 47% 54%, transparent 54%) 20% 18% / 36px 72px repeat,
+    repeating-linear-gradient(96deg, transparent 0 15px, #2f8b3f 15px 20px, transparent 20px 36px);
+  transform-origin: bottom center;
+  animation: riceWave 4.8s ease-in-out infinite;
+}
+
+.world-rice-left {
+  left: -26px;
+}
+
+.world-rice-right {
+  right: -38px;
+  transform: scaleX(-1);
+  animation-delay: -1.8s;
+}
+
+.world-farmer {
+  z-index: 6;
+  left: 48%;
+  bottom: 17%;
+  width: 92px;
+  height: 116px;
+  transform: translateX(-50%);
+  background:
+    linear-gradient(#e7be53 0 0) 18px 0 / 56px 15px,
+    linear-gradient(#e7be53 0 0) 5px 15px / 82px 15px,
+    linear-gradient(#f1c58f 0 0) 30px 24px / 32px 32px,
+    linear-gradient(#214f32 0 0) 24px 56px / 42px 38px,
+    linear-gradient(#1b2e25 0 0) 18px 94px / 16px 22px,
+    linear-gradient(#1b2e25 0 0) 56px 94px / 16px 22px,
+    linear-gradient(#f1c58f 0 0) 8px 63px / 16px 10px,
+    linear-gradient(#f1c58f 0 0) 68px 63px / 16px 10px;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 10px 0 rgba(27, 74, 37, 0.2));
+  animation: titleFarmer 1.7s steps(2) infinite;
+}
+
+.world-tractor {
+  z-index: 7;
+  right: clamp(16px, 5vw, 68px);
+  bottom: 5%;
+  width: clamp(116px, 18vw, 210px);
+  height: clamp(86px, 13vw, 158px);
+  background:
+    linear-gradient(#ffefe5 0 0) 48% 19% / 27% 21%,
+    linear-gradient(#f0442f 0 0) 30% 35% / 55% 37%,
+    linear-gradient(#9f251f 0 0) 58% 23% / 19% 18%,
+    radial-gradient(circle, #ffffff 0 13%, #18241e 14% 17%, transparent 18%) 42% 45% / 42% 36%,
+    linear-gradient(#1d2c23 0 0) 14% 70% / 27% 27%,
+    linear-gradient(#1d2c23 0 0) 70% 66% / 34% 34%,
+    linear-gradient(#efb447 0 0) 8% 34% / 18% 13%;
+  background-repeat: no-repeat;
+  border-radius: 18px 18px 12px 12px;
+  filter: drop-shadow(0 11px 0 rgba(38, 54, 34, 0.24));
+  animation: tractorBob 2.4s ease-in-out infinite;
+}
+
+.world-tractor::before {
+  content: "";
+  position: absolute;
+  left: 36%;
+  top: 42%;
+  width: 9%;
+  height: 9%;
+  border-radius: 50%;
+  background: #26341f;
+  box-shadow: 30px 0 0 #26341f;
+}
+
+.world-tractor::after {
+  content: "";
+  position: absolute;
+  left: 15%;
+  top: -15%;
+  width: 14px;
+  height: 34px;
+  border-radius: 999px;
+  background: #ffdf4d;
+  box-shadow: 28px 8px 0 -3px #ffdf4d;
+  transform: rotate(-18deg);
 }
 
 .final-screen h2 {
@@ -2032,6 +2421,28 @@ button {
   }
 }
 
+@keyframes riceWave {
+  0%, 100% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: 10px -2px;
+  }
+}
+
+@keyframes tractorBob {
+  0%, 100% {
+    translate: 0 0;
+    rotate: 0deg;
+  }
+
+  50% {
+    translate: 0 -5px;
+    rotate: -1deg;
+  }
+}
+
 @keyframes machineMove {
   from {
     transform: translateX(0);
@@ -2166,11 +2577,11 @@ button {
 
   .title-copy {
     min-height: 390px;
-    padding: 34px 24px 22px;
+    padding: 0;
   }
 
   .title-field-scene {
-    min-height: 470px;
+    min-height: 0;
   }
 
   .title-phone {
@@ -2231,12 +2642,14 @@ button {
 
   .title-hero {
     min-height: inherit;
-    grid-template-columns: minmax(300px, 0.9fr) minmax(360px, 1.1fr);
+    grid-template-columns: 1fr;
+    padding: 18px 24px;
   }
 
   .title-copy {
     min-height: 0;
-    padding: 28px;
+    gap: 10px;
+    padding: 0;
   }
 
   .title-field-scene {
@@ -2248,8 +2661,29 @@ button {
   }
 
   .title-subcopy {
-    font-size: 16px;
-    line-height: 1.55;
+    font-size: 17px;
+    line-height: 1.35;
+  }
+
+  .title-screen h2 {
+    font-size: clamp(42px, 7vw, 64px);
+  }
+
+  .start-button {
+    width: min(320px, 100%);
+    min-height: 56px;
+    font-size: 20px;
+  }
+
+  .world-farmer {
+    bottom: 18%;
+    width: 74px;
+    height: 94px;
+  }
+
+  .world-tractor {
+    width: 120px;
+    height: 90px;
   }
 
   .play-screen {
@@ -2793,10 +3227,18 @@ button {
     padding: 14px;
   }
 
+  .screen-start .app-shell {
+    padding: 0;
+  }
+
+  .title-hero {
+    padding: 18px 16px;
+  }
+
   .title-copy {
     min-height: auto;
-    gap: 12px;
-    padding: 20px 20px 18px;
+    gap: 11px;
+    padding: 16px 14px;
   }
 
   .title-copy .eyebrow {
@@ -2832,6 +3274,36 @@ button {
   .title-field-scene {
     min-height: 390px;
     padding: 18px 0 28px;
+  }
+
+  .world-village {
+    top: 47%;
+    opacity: 0.74;
+  }
+
+  .world-field {
+    bottom: 4%;
+    height: 36%;
+  }
+
+  .world-rice {
+    bottom: -8%;
+    width: 150px;
+    height: 170px;
+  }
+
+  .world-farmer {
+    left: 38%;
+    bottom: 8%;
+    width: 58px;
+    height: 74px;
+  }
+
+  .world-tractor {
+    right: 14px;
+    bottom: 4%;
+    width: 92px;
+    height: 68px;
   }
 
   .title-phone {
