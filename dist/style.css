@@ -2782,6 +2782,7 @@ button {
     line-height: 1.6;
   }
 
+  body.screen-start .rotate-prompt,
   body.screen-final .rotate-prompt {
     display: none;
   }
