@@ -282,6 +282,244 @@ button {
   gap: 18px;
 }
 
+.screen-start .topbar,
+.screen-start .status-panel,
+.screen-start .data-panel {
+  display: none;
+}
+
+.screen-start .game-grid {
+  grid-template-columns: 1fr;
+}
+
+.screen-start .main-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.title-screen {
+  min-height: min(760px, calc(100vh - 44px));
+  justify-content: stretch;
+  gap: 0;
+}
+
+.title-hero {
+  position: relative;
+  min-height: inherit;
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(360px, 1.1fr);
+  align-items: stretch;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(252, 250, 233, 0.3), rgba(255, 255, 255, 0.78)),
+    linear-gradient(135deg, #f4f9e9 0%, #e9f5cf 42%, #f9e7ad 100%);
+}
+
+.title-copy {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 18px;
+  padding: clamp(28px, 6vw, 76px);
+}
+
+.title-copy .eyebrow {
+  width: fit-content;
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid rgba(47, 125, 69, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--green-dark);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.title-screen h2 {
+  max-width: 8em;
+  color: #183a25;
+  font-size: clamp(48px, 8vw, 96px);
+  line-height: 0.95;
+  text-shadow: 0 5px 0 rgba(226, 186, 69, 0.35), 0 18px 34px rgba(34, 57, 35, 0.14);
+}
+
+.title-subcopy {
+  max-width: 640px;
+  margin: 0;
+  color: #2d4033;
+  font-size: clamp(17px, 2vw, 22px);
+  font-weight: 700;
+  line-height: 1.75;
+}
+
+.title-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.title-badges span {
+  padding: 9px 12px;
+  border: 1px solid rgba(49, 71, 55, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--green-dark);
+  font-size: 14px;
+  font-weight: 900;
+  box-shadow: 0 8px 18px rgba(47, 69, 43, 0.08);
+}
+
+.start-button {
+  width: min(320px, 100%);
+  min-height: 64px;
+  font-size: 22px;
+  box-shadow: 0 18px 34px rgba(47, 125, 69, 0.28);
+}
+
+.title-field-scene {
+  position: relative;
+  min-height: 520px;
+  overflow: hidden;
+  background: linear-gradient(#8fc8ea 0 38%, #91c865 38% 100%);
+  image-rendering: pixelated;
+}
+
+.title-field-scene::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.1) 50%, transparent 50%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 50%, transparent 50%);
+  background-size: 8px 8px;
+  pointer-events: none;
+}
+
+.title-sky,
+.title-mountains,
+.title-field,
+.title-farmer,
+.title-truck {
+  position: absolute;
+}
+
+.title-sky {
+  inset: 0 0 45%;
+}
+
+.title-sun {
+  position: absolute;
+  right: 12%;
+  top: 12%;
+  width: 56px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #f5b637;
+  box-shadow: 0 0 0 10px rgba(245, 182, 55, 0.16), 0 0 34px rgba(245, 182, 55, 0.42);
+}
+
+.title-cloud {
+  position: absolute;
+  width: 108px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 24px -10px 0 rgba(255, 255, 255, 0.86), 58px 0 0 rgba(255, 255, 255, 0.86);
+}
+
+.title-cloud-a {
+  left: 12%;
+  top: 22%;
+  animation: titleCloud 7s linear infinite;
+}
+
+.title-cloud-b {
+  right: 22%;
+  top: 28%;
+  transform: scale(0.78);
+  opacity: 0.8;
+  animation: titleCloud 9s linear infinite reverse;
+}
+
+.title-mountains {
+  left: -8%;
+  right: -8%;
+  top: 23%;
+  height: 150px;
+  background:
+    linear-gradient(135deg, transparent 0 35%, rgba(58, 112, 63, 0.62) 35% 50%, transparent 50%) 0 0 / 180px 150px repeat-x,
+    linear-gradient(45deg, transparent 0 35%, rgba(81, 132, 74, 0.58) 35% 50%, transparent 50%) 78px 0 / 210px 150px repeat-x;
+}
+
+.title-field {
+  left: 6%;
+  right: 6%;
+  bottom: 10%;
+  height: 46%;
+  border: 4px solid #314737;
+  border-radius: 8px;
+  background:
+    repeating-linear-gradient(0deg, rgba(49, 71, 55, 0.28) 0 9px, transparent 9px 42px),
+    repeating-linear-gradient(90deg, rgba(255, 230, 111, 0.45) 0 22px, rgba(87, 141, 65, 0.48) 22px 44px),
+    #69a94f;
+  box-shadow: inset 0 -38px 0 rgba(42, 91, 48, 0.5), 0 18px 30px rgba(49, 71, 55, 0.16);
+}
+
+.title-field span {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  height: 11px;
+  background: rgba(245, 228, 139, 0.72);
+  box-shadow: 0 4px 0 rgba(49, 71, 55, 0.18);
+}
+
+.title-field span:nth-child(1) { top: 16%; }
+.title-field span:nth-child(2) { top: 34%; }
+.title-field span:nth-child(3) { top: 52%; }
+.title-field span:nth-child(4) { top: 70%; }
+
+.title-farmer {
+  left: 15%;
+  bottom: 18%;
+  width: 104px;
+  height: 128px;
+  background:
+    linear-gradient(#e3ba55 0 0) 20px 0 / 64px 18px,
+    linear-gradient(#e3ba55 0 0) 8px 18px / 88px 16px,
+    linear-gradient(#2f7d45 0 0) 35px 34px / 36px 48px,
+    linear-gradient(#f1c184 0 0) 38px 18px / 30px 28px,
+    linear-gradient(#263629 0 0) 30px 82px / 16px 32px,
+    linear-gradient(#263629 0 0) 58px 82px / 16px 32px;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 10px 0 rgba(49, 71, 55, 0.16));
+  animation: titleFarmer 1.4s steps(2) infinite;
+}
+
+.title-truck {
+  right: 12%;
+  bottom: 22%;
+  width: 150px;
+  height: 82px;
+  background:
+    linear-gradient(#ffffff 0 0) 10px 26px / 90px 42px,
+    linear-gradient(#e6b24a 0 0) 88px 12px / 46px 56px,
+    linear-gradient(#314737 0 0) 19px 62px / 26px 18px,
+    linear-gradient(#314737 0 0) 104px 62px / 26px 18px;
+  background-repeat: no-repeat;
+}
+
+.title-truck::after {
+  content: "";
+  position: absolute;
+  left: 18px;
+  top: 34px;
+  width: 64px;
+  height: 20px;
+  background: repeating-linear-gradient(90deg, #f6f2d8 0 12px, #d7ddd4 12px 16px);
+}
+
 .final-screen h2 {
   color: #1f3d2b;
   font-size: 72px;
@@ -1496,6 +1734,26 @@ button {
   }
 }
 
+@keyframes titleCloud {
+  0%, 100% {
+    translate: -10px 0;
+  }
+
+  50% {
+    translate: 10px 0;
+  }
+}
+
+@keyframes titleFarmer {
+  0%, 100% {
+    translate: 0 0;
+  }
+
+  50% {
+    translate: 0 -4px;
+  }
+}
+
 @keyframes machineMove {
   from {
     transform: translateX(0);
@@ -1623,6 +1881,23 @@ button {
   .final-screen {
     min-height: 420px;
   }
+
+  .title-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .title-copy {
+    min-height: 390px;
+    padding: 34px 24px 22px;
+  }
+
+  .title-field-scene {
+    min-height: 280px;
+  }
+
+  .title-screen h2 {
+    max-width: 7.6em;
+  }
 }
 
 @media (max-width: 980px) and (orientation: landscape) {
@@ -1638,9 +1913,12 @@ button {
   }
 
   .topbar,
-  .status-panel,
-  .data-panel,
   .year-row {
+    display: none;
+  }
+
+  body:not(.screen-start) .status-panel,
+  body:not(.screen-start) .data-panel {
     display: none;
   }
 
@@ -1663,6 +1941,29 @@ button {
   .final-screen {
     min-height: calc(100svh - 34px);
     gap: 10px;
+  }
+
+  .title-screen {
+    min-height: calc(100svh - 16px);
+  }
+
+  .title-hero {
+    min-height: inherit;
+    grid-template-columns: minmax(300px, 0.9fr) minmax(360px, 1.1fr);
+  }
+
+  .title-copy {
+    min-height: 0;
+    padding: 28px;
+  }
+
+  .title-field-scene {
+    min-height: inherit;
+  }
+
+  .title-subcopy {
+    font-size: 16px;
+    line-height: 1.55;
   }
 
   .play-screen {

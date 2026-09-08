@@ -1046,6 +1046,7 @@ function render() {
   dom.startScreen.classList.toggle("hidden", state.screen !== "start");
   dom.playScreen.classList.toggle("hidden", state.screen !== "play");
   dom.finalScreen.classList.toggle("hidden", state.screen !== "final");
+  document.body.classList.toggle("screen-start", state.screen === "start");
   document.body.classList.toggle("screen-final", state.screen === "final");
   const resultFirst =
     state.screen === "play" &&
