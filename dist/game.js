@@ -460,7 +460,7 @@ async function handleAction(actionId) {
   if (state.pendingEvent || state.awaitingContinue || state.screen !== "play") return;
   const action = ACTIONS[actionId];
   const before = resultSnapshot();
-  await playDotAnimation(actionId);
+  if (!isFeaturedAction(actionId)) await playDotAnimation(actionId);
   const balanceBefore = actionBalanceSnapshot();
   actionBalanceActive = true;
   let message;
@@ -474,6 +474,7 @@ async function handleAction(actionId) {
   state.turnResult = {
     period: `${state.year}年目 ${currentPeriod().label}`,
     action: action.label,
+    actionId,
     before,
     after: resultSnapshot(),
     messages: [message],
@@ -487,6 +488,7 @@ async function handleAction(actionId) {
     state.pendingEvent = event;
   } else {
     finishPeriod();
+    await playFeaturedResult(actionId, before);
   }
   render();
 }
@@ -573,10 +575,11 @@ function randomLandOfferArea() {
   return round1(0.6 + Math.random() * 0.6);
 }
 
-function resolveEvent(choiceIndex) {
+async function resolveEvent(choiceIndex) {
   if (!state.pendingEvent) return;
   const event = state.pendingEvent;
   const choice = event.choices[choiceIndex];
+  const beforeChoice = resultSnapshot();
   const message = applyChoice(choice);
   addLog(currentPeriod().label, `${event.title}。${message}`);
   if (state.turnResult) {
@@ -586,8 +589,26 @@ function resolveEvent(choiceIndex) {
   }
   state.pendingEvent = null;
   unlockAbilities();
+  if (choice.landOffer && choice.effects?.area > 0) {
+    await EventAnimation.play("landExpansion", { areaBefore: beforeChoice.area, areaAfter: state.area, delta: choice.effects.area });
+  }
   finishPeriod();
+  await playFeaturedResult(state.turnResult?.actionId, state.turnResult?.before);
   render();
+}
+
+function isFeaturedAction(actionId) {
+  return ["carefulHarvest", "fastHarvest", "askHelp", "jaSales", "premiumSales"].includes(actionId);
+}
+
+async function playFeaturedResult(actionId, before) {
+  if (!window.EventAnimation || !actionId) return;
+  if (["carefulHarvest", "fastHarvest", "askHelp"].includes(actionId) && state.lastHarvest?.year === state.year) {
+    await EventAnimation.play("harvest", { yieldKg: state.lastHarvest.yieldKg, yieldDelta: state.lastHarvest.yieldDelta });
+  }
+  if (["jaSales", "premiumSales"].includes(actionId) && state.lastSettlement?.year === state.year) {
+    await EventAnimation.play("sale", { salesYen: state.lastSettlement.sales * 10000, price: state.lastHarvest.price, cashBefore: before?.cash, cashAfter: state.cash });
+  }
 }
 
 function applyChoice(choice) {
@@ -1250,6 +1271,7 @@ function renderActions() {
     const action = ACTIONS[id];
     const button = document.createElement("button");
     button.className = action.temporary ? "action-button temporary-action" : "action-button";
+    button.dataset.category = actionCategory(id);
     button.type = "button";
     button.disabled = !canAct;
     const badge = actionBadge(id);
@@ -1267,6 +1289,15 @@ function renderActions() {
   dom.continueButton.textContent = isFinalTurn ? "最終結果へ" : "次の時期へ";
   dom.continueButton.classList.toggle("tap-hint", state.awaitingContinue && showTapHint);
   dom.continueButton.classList.toggle("result-continue", isResultContinue);
+}
+
+function actionCategory(actionId) {
+  if (["sales", "jaSales", "premiumSales", "directVisit"].includes(actionId)) return "sales";
+  if (["maintenance", "fastPlanting", "fastHarvest"].includes(actionId)) return "machine";
+  if (["rest", "askHelp"].includes(actionId)) return "stamina";
+  if (["study", "materialCheck"].includes(actionId)) return "management";
+  if (actionId === "neighborHelp") return "trust";
+  return "cultivation";
 }
 
 function actionBadge(actionId) {
@@ -1609,4 +1640,3 @@ function signedNumber(value) {
 function last(items) {
   return items[items.length - 1];
 }
-

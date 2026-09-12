@@ -215,7 +215,17 @@
     </main>
   </div>
 
+  <div id="eventAnimation" class="event-animation hidden" aria-live="assertive" aria-modal="true" role="dialog">
+    <button class="event-animation-skip" type="button" aria-label="演出をスキップ">SKIP <span>Enter / Space</span></button>
+    <div class="event-animation-frame">
+      <div class="event-animation-scene" aria-hidden="true"></div>
+      <div class="event-animation-result"></div>
+      <div class="event-animation-delta" aria-hidden="true"></div>
+    </div>
+  </div>
+
   <script src="events.js"></script>
+  <script src="event-animation.js"></script>
   <script src="game.js"></script>
 </body>
 </html>
